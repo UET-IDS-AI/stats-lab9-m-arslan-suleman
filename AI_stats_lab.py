@@ -19,7 +19,7 @@ def joint_pmf(x, y):
         (0, 0): 0.10, (0, 1): 0.05, (0, 2): 0.00, (0, 3): 0.00,
         (1, 0): 0.15, (1, 1): 0.20, (1, 2): 0.05, (1, 3): 0.00,
         (2, 0): 0.00, (2, 1): 0.10, (2, 2): 0.15, (2, 3): 0.05,
-        (3, 0): 0.00, (3, 1): 0.00, (3, 2): 0.05, (3, 3): 0.10,
+        (3, 0): 0.00, (3, 1): 0.00, (3, 2): 0.05, (3, 3): 0.10
     }
     return pmf.get((x, y), 0.0)
 
@@ -54,8 +54,7 @@ def conditional_pmf_x_given_y(x, y):
 
 def conditional_distribution_x_given_y(y):
     """
-    Return conditional distribution of X given Y=y
-    as dictionary.
+    Return conditional distribution of X given Y=y as dictionary.
     """
     return {x: conditional_pmf_x_given_y(x, y) for x in range(4)}
 
@@ -64,12 +63,12 @@ def probability_sum_greater_than_3():
     """
     Compute P(X + Y > 3).
     """
-    prob = 0
+    total = 0
     for x in range(4):
         for y in range(4):
             if x + y > 3:
-                prob += joint_pmf(x, y)
-    return prob
+                total += joint_pmf(x, y)
+    return total
 
 
 def independence_check():
@@ -141,12 +140,11 @@ def covariance_xy():
 
 def correlation_xy():
     """
-    Compute correlation coefficient.
+    Compute correlation coefficient:
+
+    rho_XY = Cov(X,Y) / sqrt( Var(X) * Var(Y) )
     """
-    cov = covariance_xy()
-    vx = variance_x()
-    vy = variance_y()
-    return cov / np.sqrt(vx * vy)
+    return covariance_xy() / np.sqrt(variance_x() * variance_y())
 
 
 def variance_sum():
@@ -158,10 +156,10 @@ def variance_sum():
 
     for x in range(4):
         for y in range(4):
-            val = x + y
-            p = joint_pmf(x, y)
-            mean += val * p
-            mean_sq += (val ** 2) * p
+            value = x + y
+            prob = joint_pmf(x, y)
+            mean += value * prob
+            mean_sq += (value ** 2) * prob
 
     return mean_sq - mean ** 2
 
@@ -169,8 +167,11 @@ def variance_sum():
 def variance_identity_check():
     """
     Verify:
+
     Var(X+Y) = Var(X) + Var(Y) + 2*Cov(X,Y)
+
+    Return True if the identity holds, else False.
     """
     lhs = variance_sum()
     rhs = variance_x() + variance_y() + 2 * covariance_xy()
-    return np.isclose(lhs, rhs)
+    return bool(np.isclose(lhs, rhs))
